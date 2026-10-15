@@ -1,0 +1,156 @@
+# Aeon model config.
+#
+# stitching:       decoder (stitching bridge) hyper-parameters.
+# mapanything_gs:  MapAnythingGS backbone: architecture and Gaussian decoding parameters.
+#                  Do not edit: the decoding parameters (e.g. pred_head_config.cov_t_min) must match the
+#                  values the weights were trained with. Other values load without error but degrade the renders.
+name: aeon
+weights: weights/aeon.safetensors
+stitching:
+  stitch_skip_blocks: 4
+  stitching_layer_config: conv3d_k5x3x3_o1024_s1x2x2_p2x1x1
+  bridge_type: dual_conv3d_perceiver
+  bridge_config:
+    out_dim: 1024
+    out_h: 32
+    out_w: 32
+    conv3d_kernel: [5, 3, 3]
+    conv3d_stride: [1, 2, 2]
+    conv3d_padding: [2, 1, 1]
+    perceiver_num_layers: 4
+    perceiver_num_heads: 16
+    perceiver_cross_attn_freq: 1
+    perceiver_mlp_ratio: 8.0
+    perceiver_temporal_kernel: 5
+    perceiver_temporal_upsample_factor: 4
+    gate_init: 0.0
+  depth_image_adapter: {enabled: true, hidden_dim: 64}
+  vae_resolution: 512
+  ff_resolution: 448
+mapanything_gs:
+  pretrained_checkpoint_path: null
+  load_specific_pretrained_submodules: false
+  specific_pretrained_submodules: []
+  name: mapanything_gs
+  encoder_config: {encoder_str: dinov2, name: dinov2_large, data_norm_type: dinov2, size: large, with_registers: false, uses_torch_hub: false,
+    gradient_checkpointing: true}
+  info_sharing_config:
+    model_type: alternating_attention
+    model_return_type: intermediate_features
+    custom_positional_encoding: null
+    module_args:
+      name: aat_24_layers_ifr
+      indices: [11, 17]
+      norm_intermediate: true
+      size: 24_layers
+      depth: 24
+      distinguish_ref_and_non_ref_views: true
+      gradient_checkpointing: true
+      use_rand_idx_pe_for_non_reference_views: false
+      use_pe_for_non_reference_views: true
+  pred_head_config:
+    adaptor_config:
+      input_dim: 6
+      scene_rep_dim: 4
+      type: raydirs+depth+pose+confidence+mask
+      scene_rep_type: raydirs+depth+pose
+      dense_pred_init_dict: {name: raydirs+depth+pose+confidence+mask+scale, ray_directions_mode: linear, ray_directions_normalize_to_unit_sphere: true,
+        ray_directions_normalize_to_unit_image_plane: false, ray_directions_vmin: -.inf, ray_directions_vmax: .inf, ray_directions_clamp_min_of_z_dir: false,
+        ray_directions_z_dir_min: -.inf, depth_mode: softplus, depth_vmin: 0, depth_vmax: 1000.0, confidence_type: exp, confidence_vmin: 1,
+        confidence_vmax: 1000.0}
+      pose_pred_init_dict: {name: raydirs+depth+pose+confidence+mask+scale, cam_trans_mode: linear, cam_trans_vmin: -.inf,
+        cam_trans_vmax: .inf, quaternions_mode: linear, quaternions_normalize: true, quaternions_vmin: -.inf, quaternions_vmax: .inf}
+      scale_pred_init_dict: {name: raydirs+depth+pose+confidence+mask+scale, mode: softplus, vmin: 1.0e-08, vmax: 1000.0}
+    type: dpt+pose
+    feature_head:
+      feature_dim: 256
+      hooks: [0, 1, 2, 3]
+      checkpoint_gradient: true
+    regressor_head: {output_dim: 6, checkpoint_gradient: true}
+    pose_head: {num_resconv_block: 2, rot_representation_dim: 4}
+    scale_head: {output_dim: 1}
+    adaptor_type: raydirs+depth+pose+confidence+mask
+    dpt_adaptor: {name: raydirs+depth+pose+confidence+mask+scale, ray_directions_mode: linear, ray_directions_normalize_to_unit_sphere: true,
+      ray_directions_normalize_to_unit_image_plane: false, ray_directions_vmin: -.inf, ray_directions_vmax: .inf, ray_directions_clamp_min_of_z_dir: false,
+      ray_directions_z_dir_min: -.inf, depth_mode: softplus, depth_vmin: 0, depth_vmax: 1000.0, confidence_type: exp, confidence_vmin: 1,
+      confidence_vmax: 1000.0}
+    pose_adaptor: {name: raydirs+depth+pose+confidence+mask+scale, cam_trans_mode: linear, cam_trans_vmin: -.inf, cam_trans_vmax: .inf,
+      quaternions_mode: linear, quaternions_normalize: true, quaternions_vmin: -.inf, quaternions_vmax: .inf}
+    scale_adaptor: {name: raydirs+depth+pose+confidence+mask+scale, mode: softplus, vmin: 1.0e-08, vmax: 1000.0}
+    gs_adaptor: {mlp_depth: 5, mlp_dim: 256, use_bias: false, use_weight_norm: false}
+    gradient_checkpointing: true
+    ms3_deg: 4
+    omega_deg: 2
+    color_dim: 4
+    use_separate_dpt_heads: true
+    feature_head_gs:
+      feature_dim: 256
+      hooks: [0, 1, 2, 3]
+      patch_size: 14
+      input_feature_dims: [1024, 768, 768, 768]
+      checkpoint_gradient: true
+    regressor_head_gs: {input_feature_dim: 256, output_dim: 41, checkpoint_gradient: true}
+    depth_near: 0.0
+    depth_far: 1.0
+    depth_bias: 0.0
+    opacity_min: 0.0
+    opacity_max: 1.0
+    opacity_bias: 0
+    scale_min: 0.0002447746810503304
+    scale_max: 0.48954937
+    scale_bias: -2.3
+    dxyzt_min: -0.5
+    dxyzt_max: 0.5
+    dxyzt_bias: 0.0
+    dxyzt_mult: 1.0
+    sigmoid_ms3_min: 0.0
+    sigmoid_ms3_max: 2.0
+    sigmoid_ms3_bias: -6.9068
+    ms3_clamp: 0.0001
+    cov_t_min: 0.03
+    cov_t_max: 3.0
+    cov_t_bias: 0.0
+    sigmoid_omega_min: 0.0
+    sigmoid_omega_max: 2.0
+    sigmoid_omega_bias: -6.9068
+    omega_clamp: 0.0001
+    rgb_min: 0.0
+    rgb_max: 1.0
+    rgb_bias: 0.0
+    recalc_magic_pattern: false
+    recalc_method: patch_sorting
+    magic_num: 49
+    magic_pattern:
+    - [0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 6, 6, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 8, 8, 10, 10, 10,
+      10, 10, 10, 10, 12, 12, 12, 12, 12, 12, 12]
+    - [0, 2, 4, 6, 8, 10, 12, 0, 2, 4, 6, 8, 10, 12, 0, 2, 4, 6, 8, 10, 12, 0, 2, 4, 6, 8, 10, 12, 0, 2, 4, 6, 8, 10, 12,
+      0, 2, 4, 6, 8, 10, 12, 0, 2, 4, 6, 8, 10, 12]
+    patch_size: [14, 14]
+    ms3_deg_downmax_mult: 8.0
+    omega_deg_downmax_mult: 8.0
+    perturb_xyz: true
+    perturb_t: true
+    use_high_resolution: false
+    use_image_adapter: true
+    image_adapter_config:
+      adapter_hidden_dim: 64
+      share_input_merger: false
+      enabled_params: {opacity: false, scale: false, rotation: false, rgb: true}
+      input_merger: {in_chans: 3, hidden_dim: 64, num_layers: 2, use_residual: true}
+      output_conv: {head_features_1: 32, head_features_2: 16}
+  geometric_input_config:
+    ray_dirs_encoder_config: {name: ray_dirs_encoder, in_chans: 3, encoder_str: dense_rep_encoder, apply_pe: false}
+    depth_encoder_config: {name: depth_encoder, in_chans: 1, encoder_str: dense_rep_encoder, apply_pe: false}
+    cam_rot_encoder_config: {name: cam_rot_quats_encoder, in_chans: 4, encoder_str: global_rep_encoder}
+    cam_trans_encoder_config: {name: cam_trans_encoder, in_chans: 3, encoder_str: global_rep_encoder}
+    scale_encoder_config: {name: scale_encoder, in_chans: 1, encoder_str: global_rep_encoder}
+    overall_prob: 0.9
+    dropout_prob: 0.05
+    ray_dirs_prob: 0
+    depth_prob: 0
+    cam_prob: 0
+    sparse_depth_prob: 0
+    sparsification_removal_percent: 0
+    depth_scale_norm_all_prob: 0
+    pose_scale_norm_all_prob: 0
+    rgb_encoder_config: {name: rgb_encoder, in_chans: 3, encoder_str: dense_rep_encoder}

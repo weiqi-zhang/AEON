@@ -1,0 +1,23 @@
+# Tested with Python 3.12, torch 2.13 + CUDA 13.0. Install torch/torchvision matching your CUDA first.
+torch>=2.1
+torchvision
+# Wan2.1 pipelines -- pinned to the versions the release was validated with
+diffusers==0.33.1
+transformers==4.46.3
+accelerate            # --cpu_offload
+ftfy                  # Wan prompt cleaning; without it the text embedding (and the output) changes
+# 4DGS rasterization (CUDA kernels are JIT-compiled on first use: needs nvcc + ninja)
+gsplat==1.5.3
+ninja
+safetensors
+PyYAML
+numpy
+einops
+jaxtyping
+huggingface_hub
+opencv-python-headless
+matplotlib<3.9        # code uses matplotlib.cm.get_cmap (removed in 3.9)
+imageio
+imageio-ffmpeg
+plyfile
+Pillow

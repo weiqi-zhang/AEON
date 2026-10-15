@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aeon-4d"
+version = "1.0.0"
+description = "Aeon inference: text / image -> Wan2.1 video latent -> 4D Gaussian Splatting"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md", "aeon4d/_vendor/*/LICENSE"]
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.1",
+    "torchvision",
+    "diffusers==0.33.1",
+    "transformers==4.46.3",
+    "accelerate",
+    "ftfy",
+    "gsplat==1.5.3",
+    "ninja",
+    "safetensors",
+    "PyYAML",
+    "numpy",
+    "einops",
+    "jaxtyping",
+    "huggingface_hub",
+    "opencv-python-headless",
+    "matplotlib<3.9",
+    "imageio",
+    "imageio-ffmpeg",
+    "plyfile",
+    "Pillow",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.scripts]
+aeon-generate = "aeon4d.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["aeon4d*"]
+
+[tool.setuptools.package-data]
+aeon4d = ["configs/*.yaml", "_vendor/*/LICENSE"]
