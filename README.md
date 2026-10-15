@@ -11,6 +11,7 @@ School of Software, Tsinghua University
 <sup>†</sup> Corresponding authors
 
 [![Project Page](https://img.shields.io/badge/Project-Page-blue)](https://weiqi-zhang.github.io/AEON/)
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Weights-yellow)](https://huggingface.co/wiki1231/AEON)
 
 </div>
 
@@ -87,12 +88,18 @@ pip install -e .            # installs the `aeon-4d` package (import name `aeon4
 
 | Model | Size | Used for |
 |---|---|---|
-| `weights/aeon.safetensors` | 3.3 GB | AEON decoder (hosting link: TODO) |
+| [wiki1231/AEON](https://huggingface.co/wiki1231/AEON) | 3.3 GB | video latent → 4DGS (AEON decoder) |
 | [Wan-AI/Wan2.1-T2V-1.3B-Diffusers](https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B-Diffusers) | 29 GB | text → video |
 | [Wan-AI/Wan2.1-I2V-14B-480P-Diffusers](https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-480P-Diffusers) | 90 GB | image + text → video |
 
-Put the decoder weights at `weights/aeon.safetensors` in the repository, or pass their path with `--weights`. By
-default the Wan models are loaded by their Hugging Face ids. To use a local copy, pass its directory with
+Download the decoder weights to `weights/aeon.safetensors` in the repository, or keep them elsewhere and pass their
+path with `--weights`:
+
+```bash
+huggingface-cli download wiki1231/AEON aeon.safetensors --local-dir weights
+```
+
+By default the Wan models are loaded by their Hugging Face ids. To use a local copy, pass its directory with
 `--wan_model`. You can download a local copy from Hugging Face or ModelScope:
 
 ```bash

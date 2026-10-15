@@ -216,7 +216,8 @@ def main(argv=None):
     weights = resolve_path(args.weights or config["weights"])
     if not os.path.isfile(weights):  # fail before spending a minute on loading Wan
         raise SystemExit(f"Aeon weights not found: {weights}\n"
-                         "Download aeon.safetensors and pass its path with --weights.")
+                         "Download aeon.safetensors from https://huggingface.co/wiki1231/AEON "
+                         "and pass its path with --weights.")
 
     device = torch.device(args.device)
     torch.manual_seed(args.seed)  # Wan noise for sample k depends on this seed and on samples 0..k-1
