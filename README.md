@@ -11,6 +11,7 @@ School of Software, Tsinghua University
 <sup>†</sup> Corresponding authors
 
 [![Project Page](https://img.shields.io/badge/Project-Page-blue)](https://weiqi-zhang.github.io/AEON/)
+[![arXiv](https://img.shields.io/badge/arXiv-2610.28631-b31b1b.svg)](https://arxiv.org/abs/2610.28631)
 [![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Weights-yellow)](https://huggingface.co/wiki1231/AEON)
 
 </div>
